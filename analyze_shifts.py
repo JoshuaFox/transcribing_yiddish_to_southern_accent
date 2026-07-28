@@ -1,5 +1,6 @@
 import json
 import re
+import datetime
 
 with open("dictionary_index.json", "r", encoding="utf-8") as f:
     index = json.load(f)
@@ -15,7 +16,16 @@ for word, entries in index.items():
             std, sy = match.groups()
             patterns.append((word, std, sy))
 
-# Print a subset of interesting ones
+# Generate timestamped filename
+ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+output_file = f"shift_mapping_details_{ts}.txt"
+
 print(f"Found {len(patterns)} explicit SY shift entries.")
-for p in patterns[:50]:
-    print(f"Word: {p[0]} | Std: {p[1]} | SY: {p[2]}")
+with open(output_file, "w", encoding="utf-8") as f:
+    f.write(f"Found {len(patterns)} explicit SY shift entries.\n")
+    for p in patterns[:50]:
+        line = f"Word: {p[0]} | Std: {p[1]} | SY: {p[2]}"
+        print(line)
+        f.write(line + "\n")
+
+print(f"Results written to {output_file}")

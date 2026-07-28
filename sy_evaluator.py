@@ -100,15 +100,18 @@ Output as a word-by-word table in English.
         return f"Error in analysis: {e}"
 
 def main():
+    import datetime
     input_file = "EnglishOysyesGalkhes.txt"
-    output_interleaved = "EnglishOysyesGalkhes_SY.txt"
-    output_analysis = "Transcription_Analysis.md"
+    ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_interleaved = f"EnglishOysyesGalkhes_SY_{ts}.txt"
+    output_analysis = f"Transcription_Analysis_{ts}.md"
     max_paragraphs = 3 # Small sample for demo
     
     transcriber = SYTranscriber()
     triplets = parse_input_file(input_file)[:max_paragraphs]
     
     full_output, analysis_results = [], []
+    correction_justifications = []
     
     for i, triplet in enumerate(triplets):
         print(f"--- Processing Paragraph {i+1} ---")
@@ -120,6 +123,7 @@ def main():
         
         if corrections and "No changes" not in corrections:
             print(f"CORRECTIONS MADE:\n{corrections}\n")
+            correction_justifications.append(f"## Paragraph {i+1}\n{corrections}\n")
         else:
             print("No corrections needed.\n")
 
@@ -141,7 +145,11 @@ def main():
         f.write("\n".join(full_output))
     with open(output_analysis, 'w', encoding='utf-8') as f:
         f.write("\n".join(analysis_results))
-    print(f"Done! Interleaved: {output_interleaved}, Analysis: {output_analysis}")
+        
+    corr_file = f"correction_justifications_{ts}.txt"
+    with open(corr_file, 'w', encoding='utf-8') as f:
+        f.write("\n".join(correction_justifications))
+    print(f"Done! Interleaved: {output_interleaved}, Analysis: {output_analysis}, Justifications: {corr_file}")
 
 if __name__ == "__main__":
     main()
